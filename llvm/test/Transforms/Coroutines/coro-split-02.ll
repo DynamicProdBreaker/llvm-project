@@ -47,6 +47,7 @@ exit:
 ; CHECK-NEXT:    call void @print(i32 %test)
 ; CHECK-NEXT:    call void @llvm.lifetime.end.p0(ptr %testval)
 ; CHECK-NEXT:    call void @print(i32 %val)
+; CHECK-NEXT:    tail call void %destroy(ptr %vFrame)
 ; CHECK-NEXT:    ret void
 
 declare token @llvm.coro.id(i32, ptr readnone, ptr nocapture readonly, ptr)

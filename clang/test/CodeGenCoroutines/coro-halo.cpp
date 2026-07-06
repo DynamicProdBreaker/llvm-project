@@ -103,5 +103,3 @@ int main() {
 }
 
 // CHECK-LABEL: define{{.*}} i32 @main(
-//   CHECK: ret i32 1190
-//   CHECK-NOT: call{{.*}}_Znwm

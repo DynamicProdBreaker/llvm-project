@@ -45,8 +45,7 @@ suspend:
 
 ;
 ; CHECK_SPLITTED-LABEL: f.resume(
-; CHECK_SPLITTED-NEXT:  :
-; CHECK_SPLITTED-NEXT:    call i32 @readnone_func() #[[ATTR_NUM:[0-9]+]]
+; CHECK_SPLITTED:         call i32 @readnone_func() #[[ATTR_NUM:[0-9]+]]
 ; CHECK_SPLITTED-NEXT:    call void @nop()
 ; CHECK_SPLITTED-NEXT:    call void @print_same()
 ;

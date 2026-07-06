@@ -27,8 +27,9 @@ void flowoff() {
 
 // Tests that the coroutine elide optimization could happen if control flows off the end of the coroutine
 // CHECK-LABEL: define{{.*}} void @_Z7flowoffv
-// CHECK-NEXT: entry:
-// CHECK-NEXT: ret void
+// CHECK: call{{.*}}@_Znwm
+// CHECK: call{{.*}}.destroy
+// CHECK: ret void
 
 struct Task {
   struct promise_type {

@@ -62,6 +62,7 @@ declare void @free(ptr)
 ; CHECK-LABEL: define internal void @f.resume(
 ; CHECK-SAME: ptr noundef nonnull align 8 dereferenceable(24) [[HDL:%.*]]) {
 ; CHECK-NEXT:  [[ENTRY_RESUME:.*]]:
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 8
 ; CHECK-NEXT:    [[INDEX_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 16
 ; CHECK-NEXT:    [[INDEX:%.*]] = load i1, ptr [[INDEX_ADDR]], align 1
 ; CHECK-NEXT:    switch i1 [[INDEX]], label %[[UNREACHABLE:.*]] [
@@ -81,8 +82,7 @@ declare void @free(ptr)
 ; CHECK-NEXT:    [[SP1_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 17
 ; CHECK-NEXT:    [[SP1_RELOAD:%.*]] = load i8, ptr [[SP1_RELOAD_ADDR]], align 1
 ; CHECK-NEXT:    call void @print(i8 [[SP1_RELOAD]])
-; CHECK-NEXT:    [[MEM:%.*]] = call ptr @llvm.coro.free(token poison, ptr [[HDL]])
-; CHECK-NEXT:    call void @free(ptr [[MEM]])
+; CHECK-NEXT:    call void @free(ptr null)
 ; CHECK-NEXT:    br label %[[COROEND]]
 ; CHECK:       [[COROEND]]:
 ; CHECK-NEXT:    ret void

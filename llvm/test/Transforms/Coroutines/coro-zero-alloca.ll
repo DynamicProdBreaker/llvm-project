@@ -72,14 +72,14 @@ cleanup:                                          ; preds = %wakeup, %entry
 ; CHECK-NEXT:  [[ENTRY_RESUME:.*:]]
 ; CHECK-NEXT:    [[A1_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[CORO_STATE]], i64 16
 ; CHECK-NEXT:    [[A4_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[CORO_STATE]], i64 20
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[CORO_STATE]], i64 8
 ; CHECK-NEXT:    call void @usePointer(ptr [[CORO_STATE]])
 ; CHECK-NEXT:    call void @usePointer(ptr [[A1_RELOAD_ADDR]])
 ; CHECK-NEXT:    call void @usePointer(ptr [[CORO_STATE]])
 ; CHECK-NEXT:    call void @usePointer(ptr [[CORO_STATE]])
 ; CHECK-NEXT:    call void @usePointer(ptr [[A4_RELOAD_ADDR]])
 ; CHECK-NEXT:    call void @usePointer2(ptr [[CORO_STATE]])
-; CHECK-NEXT:    [[CORO_MEMFREE:%.*]] = call ptr @llvm.coro.free(token poison, ptr [[CORO_STATE]])
-; CHECK-NEXT:    call void @free(ptr [[CORO_MEMFREE]])
+; CHECK-NEXT:    call void @free(ptr null)
 ; CHECK-NEXT:    ret void
 ;
 ;

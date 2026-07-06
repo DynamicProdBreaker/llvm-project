@@ -93,6 +93,8 @@ declare ptr @llvm.coro.free(token, ptr nocapture readonly)
 ; CHECK-LABEL: define internal void @h.resume(
 ; CHECK-SAME: ptr noundef nonnull align 8 dereferenceable(32) [[HDL:%.*]]) personality i32 0 {
 ; CHECK-NEXT:  [[ENTRY_RESUME:.*:]]
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 8
+; CHECK-NEXT:    [[DESTROY:%.*]] = load ptr, ptr [[DESTROY_ADDR]], align 8
 ; CHECK-NEXT:    [[COND_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 25
 ; CHECK-NEXT:    [[COND_RELOAD:%.*]] = load i1, ptr [[COND_RELOAD_ADDR]], align 1
 ; CHECK-NEXT:    br i1 [[COND_RELOAD]], label %[[INVOKE1:.*]], label %[[INVOKE2:.*]]
@@ -120,6 +122,7 @@ declare ptr @llvm.coro.free(token, ptr nocapture readonly)
 ; CHECK-NEXT:    call void @use_val(i32 [[VAL]])
 ; CHECK-NEXT:    catchret from [[PAD]] to label %[[COROEND]]
 ; CHECK:       [[COROEND]]:
+; CHECK-NEXT:    tail call void [[DESTROY]](ptr [[HDL]])
 ; CHECK-NEXT:    ret void
 ;
 ;

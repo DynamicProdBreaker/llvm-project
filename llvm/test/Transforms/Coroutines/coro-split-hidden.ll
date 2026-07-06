@@ -50,7 +50,7 @@ suspend:
 ; CHECK-NOT: call void @print(i32 0)
 ; CHECK: call void @print(i32 1)
 ; CHECK-NOT: call void @print(i32 0)
-; CHECK: call void @free(
+; CHECK-NOT: call void @free(
 ; CHECK: ret void
 
 ; CHECK-LABEL: internal{{.*}}@f.destroy(

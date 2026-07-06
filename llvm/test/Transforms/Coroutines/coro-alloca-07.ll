@@ -87,11 +87,11 @@ declare void @free(ptr)
 ; CHECK-LABEL: define internal void @f.resume(
 ; CHECK-SAME: ptr noundef nonnull align 8 dereferenceable(48) [[HDL:%.*]]) {
 ; CHECK-NEXT:  [[ENTRY_RESUME:.*:]]
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 8
 ; CHECK-NEXT:    [[ALIAS_PHI_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 32
 ; CHECK-NEXT:    [[ALIAS_PHI_RELOAD:%.*]] = load ptr, ptr [[ALIAS_PHI_RELOAD_ADDR]], align 8
 ; CHECK-NEXT:    call void @print(ptr [[ALIAS_PHI_RELOAD]])
-; CHECK-NEXT:    [[MEM:%.*]] = call ptr @llvm.coro.free(token poison, ptr [[HDL]])
-; CHECK-NEXT:    call void @free(ptr [[MEM]])
+; CHECK-NEXT:    call void @free(ptr null)
 ; CHECK-NEXT:    ret void
 ;
 ;

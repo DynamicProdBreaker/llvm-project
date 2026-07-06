@@ -79,12 +79,15 @@ declare void @llvm.lifetime.end.p0(ptr nocapture) #4
 ; CHECK-NEXT:  [[ENTRY_RESUME:.*:]]
 ; CHECK-NEXT:    [[TESTVAL:%.*]] = alloca i8, align 1
 ; CHECK-NEXT:    [[REF_TMP7:%.*]] = alloca %"struct.lean_future<int>::Awaiter", align 8
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[VFRAME]], i64 8
+; CHECK-NEXT:    [[DESTROY:%.*]] = load ptr, ptr [[DESTROY_ADDR]], align 8
 ; CHECK-NEXT:    call void @llvm.lifetime.start.p0(ptr [[TESTVAL]])
 ; CHECK-NEXT:    [[VAL:%.*]] = load i32, ptr [[REF_TMP7]], align 4
 ; CHECK-NEXT:    [[TEST:%.*]] = load i8, ptr [[TESTVAL]], align 1
 ; CHECK-NEXT:    call void @consume.i8(i8 [[TEST]])
 ; CHECK-NEXT:    call void @llvm.lifetime.end.p0(ptr [[TESTVAL]])
 ; CHECK-NEXT:    call void @print(i32 [[VAL]])
+; CHECK-NEXT:    tail call void [[DESTROY]](ptr [[VFRAME]])
 ; CHECK-NEXT:    ret void
 ;
 ;

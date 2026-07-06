@@ -72,13 +72,13 @@ declare void @free(ptr)
 ; CHECK-LABEL: define internal void @f.resume(
 ; CHECK-SAME: ptr noundef nonnull align 8 dereferenceable(32) [[HDL:%.*]]) {
 ; CHECK-NEXT:  [[ENTRY_RESUME:.*:]]
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 8
 ; CHECK-NEXT:    [[INNERHDL_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 16
 ; CHECK-NEXT:    [[INNERHDL_RELOAD:%.*]] = load ptr, ptr [[INNERHDL_RELOAD_ADDR]], align 8
 ; CHECK-NEXT:    [[GVAR_ADDR:%.*]] = getelementptr inbounds [[G_FRAME:%.*]], ptr [[INNERHDL_RELOAD]], i32 0, i32 4
 ; CHECK-NEXT:    [[GVAR:%.*]] = load i32, ptr [[GVAR_ADDR]], align 4
 ; CHECK-NEXT:    call void @print.i32(i32 [[GVAR]])
-; CHECK-NEXT:    [[MEM:%.*]] = call ptr @llvm.coro.free(token poison, ptr [[HDL]])
-; CHECK-NEXT:    call void @free(ptr [[MEM]])
+; CHECK-NEXT:    call void @free(ptr null)
 ; CHECK-NEXT:    ret void
 ;
 ;

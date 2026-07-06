@@ -121,6 +121,8 @@ declare void @free(ptr)
 ; CHECK-SAME: ptr noundef nonnull align 8 dereferenceable(24) [[HDL:%.*]]) personality i32 0 {
 ; CHECK-NEXT:  [[ENTRY_RESUME:.*]]:
 ; CHECK-NEXT:    [[AWAITER_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 0
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 8
+; CHECK-NEXT:    [[DESTROY:%.*]] = load ptr, ptr [[DESTROY_ADDR]], align 8
 ; CHECK-NEXT:    [[INDEX_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 16
 ; CHECK-NEXT:    [[INDEX:%.*]] = load i2, ptr [[INDEX_ADDR]], align 1
 ; CHECK-NEXT:    switch i2 [[INDEX]], label %[[UNREACHABLE:.*]] [
@@ -166,8 +168,7 @@ declare void @free(ptr)
 ; CHECK-NEXT:    call void @__cxa_end_catch()
 ; CHECK-NEXT:    br label %[[CLEANUP]]
 ; CHECK:       [[CLEANUP]]:
-; CHECK-NEXT:    [[MEM:%.*]] = call ptr @llvm.coro.free(token poison, ptr [[HDL]])
-; CHECK-NEXT:    call void @free(ptr [[MEM]])
+; CHECK-NEXT:    call void @free(ptr null)
 ; CHECK-NEXT:    br label %[[COROEND]]
 ; CHECK:       [[COROEND]]:
 ; CHECK-NEXT:    ret void

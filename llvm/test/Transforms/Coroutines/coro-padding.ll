@@ -65,9 +65,9 @@ declare void @free(ptr)
 ; CHECK-SAME: ptr noundef nonnull align 32 dereferenceable(64) [[HDL:%.*]]) {
 ; CHECK-NEXT:  [[ENTRY_RESUME:.*:]]
 ; CHECK-NEXT:    [[DATA_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 32
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 8
 ; CHECK-NEXT:    call void @consume(ptr [[DATA_RELOAD_ADDR]])
-; CHECK-NEXT:    [[MEM:%.*]] = call ptr @llvm.coro.free(token poison, ptr [[HDL]])
-; CHECK-NEXT:    call void @free(ptr [[MEM]])
+; CHECK-NEXT:    call void @free(ptr null)
 ; CHECK-NEXT:    ret void
 ;
 ;

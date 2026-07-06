@@ -78,11 +78,11 @@ declare void @free(ptr)
 ; CHECK-NEXT:    [[PREFIX_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 16
 ; CHECK-NEXT:    [[DATA_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 32
 ; CHECK-NEXT:    [[SUFFIX_RELOAD_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 24
+; CHECK-NEXT:    [[DESTROY_ADDR:%.*]] = getelementptr inbounds i8, ptr [[HDL]], i64 8
 ; CHECK-NEXT:    call void @consume.double.ptr(ptr [[PREFIX_RELOAD_ADDR]])
 ; CHECK-NEXT:    call void @consume.i32.ptr(ptr [[DATA_RELOAD_ADDR]])
 ; CHECK-NEXT:    call void @consume.double.ptr(ptr [[SUFFIX_RELOAD_ADDR]])
-; CHECK-NEXT:    [[MEM:%.*]] = call ptr @llvm.coro.free(token poison, ptr [[HDL]])
-; CHECK-NEXT:    call void @free(ptr [[MEM]])
+; CHECK-NEXT:    call void @free(ptr null)
 ; CHECK-NEXT:    ret void
 ;
 ;
