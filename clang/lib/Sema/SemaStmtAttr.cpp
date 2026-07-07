@@ -351,6 +351,64 @@ static Attr *handleMustTailAttr(Sema &S, Stmt *St, const ParsedAttr &A,
   return ::new (S.Context) MustTailAttr(S.Context, A);
 }
 
+/// Return true if St is an atomic operation or fence builtin call.
+static bool isAtomicOp(const Stmt *St, const Builtin::Context &BI) {
+  const Expr *E = dyn_cast<Expr>(St);
+  if (!E)
+    return false;
+
+  E = E->IgnoreParenCasts();
+
+  if (isa<AtomicExpr>(E))
+    return true;
+
+  // _Atomic type qualifier operations: assignments and compound assignments
+  // to atomic lvalues, and loads from atomic lvalues.
+  if (const auto *BO = dyn_cast<BinaryOperator>(E)) {
+    if (BO->getLHS()->getType()->isAtomicType())
+      return true;
+  } else if (E->getType()->isAtomicType()) {
+    return true;
+  }
+
+  const CallExpr *CE = dyn_cast<CallExpr>(E);
+  if (!CE)
+    return false;
+
+  unsigned BuiltinID = CE->getBuiltinCallee();
+  switch (BuiltinID) {
+  case Builtin::BI__atomic_thread_fence:
+  case Builtin::BI__atomic_signal_fence:
+  case Builtin::BI__c11_atomic_thread_fence:
+  case Builtin::BI__c11_atomic_signal_fence:
+  case Builtin::BI__scoped_atomic_thread_fence:
+    return true;
+  default:
+    break;
+  }
+
+  return BI.isTargetAtomicBuiltin(BuiltinID);
+}
+
+static Attr *handleAMDGCNAVAttr(Sema &S, Stmt *St, const ParsedAttr &A,
+                                SourceRange Range) {
+  StringRef Mode;
+  if (!S.checkStringLiteralArgumentAttr(A, 0, Mode))
+    return nullptr;
+
+  if (Mode != "none") {
+    S.Diag(A.getLoc(), diag::warn_attribute_type_not_supported) << A << Mode;
+    return nullptr;
+  }
+
+  if (!isAtomicOp(St, S.Context.BuiltinInfo)) {
+    S.Diag(A.getLoc(), diag::warn_amdgcn_av_requires_atomic) << A;
+    return nullptr;
+  }
+
+  return ::new (S.Context) AMDGCNAVAttr(S.Context, A, Mode);
+}
+
 static Attr *handleLikely(Sema &S, Stmt *St, const ParsedAttr &A,
                           SourceRange Range) {
 
@@ -730,6 +788,8 @@ static Attr *ProcessStmtAttribute(Sema &S, Stmt *St, const ParsedAttr &A,
     return handleNoInlineAttr(S, St, A, Range);
   case ParsedAttr::AT_MustTail:
     return handleMustTailAttr(S, St, A, Range);
+  case ParsedAttr::AT_AMDGCNAV:
+    return handleAMDGCNAVAttr(S, St, A, Range);
   case ParsedAttr::AT_Likely:
     return handleLikely(S, St, A, Range);
   case ParsedAttr::AT_Unlikely:
