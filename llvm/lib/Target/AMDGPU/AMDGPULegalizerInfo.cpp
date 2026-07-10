@@ -293,6 +293,10 @@ static LegalityPredicate elementTypeIsLegal(unsigned TypeIdx) {
   };
 }
 
+const LLT I16 = LLT::integer(16);
+constexpr LLT F16 = LLT::float16();
+constexpr LLT BF16 = LLT::bfloat16();
+
 constexpr LLT S1 = LLT::scalar(1);
 constexpr LLT S8 = LLT::scalar(8);
 constexpr LLT S16 = LLT::scalar(16);
@@ -926,6 +930,7 @@ AMDGPULegalizerInfo::AMDGPULegalizerInfo(const GCNSubtarget &ST_,
   getActionDefinitionsBuilder(G_BITCAST)
       // Don't worry about the size constraint.
       .legalIf(all(isRegisterClassType(ST, 0), isRegisterClassType(ST, 1)))
+      .customFor({{I16, F16}, {F16, I16}, {I16, BF16}, {BF16, I16}})
       .lower();
 
   getActionDefinitionsBuilder(G_CONSTANT)
@@ -2314,6 +2319,8 @@ bool AMDGPULegalizerInfo::legalizeCustom(
   switch (MI.getOpcode()) {
   case TargetOpcode::G_ADDRSPACE_CAST:
     return legalizeAddrSpaceCast(MI, MRI, B);
+  case TargetOpcode::G_BITCAST:
+    return legalizeBitcast(MI, MRI, B);
   case TargetOpcode::G_INTRINSIC_ROUNDEVEN:
     return legalizeFroundeven(MI, MRI, B);
   case TargetOpcode::G_FCEIL:
@@ -2700,6 +2707,15 @@ bool AMDGPULegalizerInfo::legalizeAddrSpaceCast(
   // Invalid casts are poison.
   // TODO: Should return poison
   B.buildUndef(Dst);
+  MI.eraseFromParent();
+  return true;
+}
+
+bool AMDGPULegalizerInfo::legalizeBitcast(MachineInstr &MI,
+                                          MachineRegisterInfo &MRI,
+                                          MachineIRBuilder &B) const {
+  B.buildTrunc(MI.getOperand(0).getReg(),
+               B.buildAnyExt(LLT::integer(32), MI.getOperand(1).getReg()));
   MI.eraseFromParent();
   return true;
 }
